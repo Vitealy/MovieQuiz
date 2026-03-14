@@ -108,7 +108,8 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.cornerRadius = 20
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            self?.showNextQuestionOrResults()
+            guard let self else { return }
+            self.showNextQuestionOrResults()
         }
     }
     
