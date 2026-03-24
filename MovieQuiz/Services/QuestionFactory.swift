@@ -1,14 +1,10 @@
-//
-//  QuestionFactory.swift
-//  MovieQuiz
-//
-//  Created by Vitaly Kashavkin on 16.03.2026.
-//
-
 import Foundation
 
 
 class QuestionFactory: QuestionFactoryProtocol {
+    
+    weak var delegate: QuestionFactoryDelegate?
+    
     private let questions: [QuizQuestion] = [
         QuizQuestion(imageName: "The Godfather",
                      text: "Рейтинг этого фильма больше чем 6?",
@@ -42,13 +38,13 @@ class QuestionFactory: QuestionFactoryProtocol {
                      correctAnswer: false)
     ]
     
-    func requestNextQuestion() -> QuizQuestion? {
-        
+    func requestNextQuestion() {
         guard let index = (0..<questions.count).randomElement() else {
-            return nil
+            delegate?.didReceiveNextQuestion(question: nil)
+            return
         }
-
-        return questions[safe: index]
+        
+        let question = questions[safe: index]
+        delegate?.didReceiveNextQuestion(question: question)
     }
-    
 }
