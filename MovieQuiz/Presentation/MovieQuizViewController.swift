@@ -38,8 +38,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         currentQuestion = question
         let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
-                self?.show(quiz: viewModel)
-            }
+            self?.show(quiz: viewModel)
+        }
     }
     // MARK: - Private functions
     
@@ -47,17 +47,17 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let statistics = statisticService.getFullStatistics()
         
         let alertModel = AlertModel(
-                title: result.title,
-                message: result.text + "\n" + statistics,
-                buttonText: result.buttonText,
-                completion: { [weak self] in
-                    guard let self = self else { return }
-                    self.currentQuestionIndex = 0
-                    self.correctAnswers = 0
-                    self.questionFactory?.requestNextQuestion()
-                }
-            )
-            alertPresenter.presentAlert(with: alertModel)
+            title: result.title,
+            message: result.text + "\n" + statistics,
+            buttonText: result.buttonText,
+            completion: { [weak self] in
+                guard let self = self else { return }
+                self.currentQuestionIndex = 0
+                self.correctAnswers = 0
+                self.questionFactory?.requestNextQuestion()
+            }
+        )
+        alertPresenter.presentAlert(with: alertModel)
     }
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
