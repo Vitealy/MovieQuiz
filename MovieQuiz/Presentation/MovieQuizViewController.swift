@@ -41,6 +41,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self?.show(quiz: viewModel)
         }
     }
+    
     // MARK: - Private functions
     
     private func showResults(quiz result: QuizResultsViewModel) {
