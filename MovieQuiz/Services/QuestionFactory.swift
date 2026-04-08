@@ -27,8 +27,8 @@ final class QuestionFactory: QuestionFactoryProtocol {
     }  
     
     func didLoadDataFromServer() {
-           print("Данные успешно загружены!")
-       }
+        print("Данные успешно загружены!")
+    }
     
     func didFailToLoadData(with error: Error) {
         print("Не удалось загрузить данные: \(error.localizedDescription)")
@@ -42,8 +42,8 @@ final class QuestionFactory: QuestionFactoryProtocol {
             guard let movie = self.movies[safe: index] else { return }
             
             var imageData = Data()
-           
-           do {
+            
+            do {
                 imageData = try Data(contentsOf: movie.imageURL)
             } catch {
                 print("Failed to load image")
@@ -55,8 +55,8 @@ final class QuestionFactory: QuestionFactoryProtocol {
             let correctAnswer = rating > 7
             
             let question = QuizQuestion(imageName: imageData,
-                                         text: text,
-                                         correctAnswer: correctAnswer)
+                                        text: text,
+                                        correctAnswer: correctAnswer)
             
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
