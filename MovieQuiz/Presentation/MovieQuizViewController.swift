@@ -7,13 +7,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private weak var textLabel: UILabel!
     @IBOutlet private weak var yesButton: UIButton!
     @IBOutlet private weak var noButton: UIButton!
+    @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
     private let questionsAmount: Int = 10
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
     private var alertPresenter: AlertPresenter!
-    private let statisticService: StatisticServiceProtocol = StatisticService()
+    private var statisticService: StatisticServiceProtocol = StatisticService()
+    private var isLoading = false
     
     // MARK: - Lifecycle
     
@@ -22,10 +24,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         alertPresenter = AlertPresenter(viewController: self)
         
-        let questionFactory = QuestionFactory()
-        questionFactory.delegate = self
-        self.questionFactory = questionFactory
-        questionFactory.requestNextQuestion()
+        imageView.layer.cornerRadius = 20
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        statisticService = StatisticService()
+        
+        showLoadingIndicator()
+        questionFactory?.loadData()
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -63,7 +67,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
-            image: UIImage(named: model.imageName) ?? UIImage(),
+            image: UIImage(data: model.imageName) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
         return questionStep
@@ -109,6 +113,81 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             currentQuestionIndex += 1
             questionFactory?.requestNextQuestion()
         }
+    }
+    
+    private func showLoadingIndicator() {
+        isLoading = true
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+        setAnswerButtonsEnabled(false)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) { [weak self] in
+            guard let self = self else { return }
+            if self.activityIndicator.isAnimating {
+                self.hideLoadingIndicator()
+                self.showNetworkError(message: "Сервер долго не отвечает. Попробуйте позже.")
+            }
+        }
+    }
+    
+    private func hideLoadingIndicator() {
+        isLoading = false
+        activityIndicator.isHidden = true
+        activityIndicator.stopAnimating()
+    }
+    
+    private func showNetworkError(message: String) {
+        guard !isLoading else { return }
+        
+        hideLoadingIndicator()
+        
+        let model = AlertModel(title: "Ошибка",
+                               message: message,
+                               buttonText: "Попробовать еще раз") { [weak self] in
+            guard let self = self, !self.isLoading else { return }
+            
+            self.showLoadingIndicator()
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            self.currentQuestion = nil
+            self.setAnswerButtonsEnabled(false)
+            self.questionFactory?.loadData()
+        }
+        
+        alertPresenter.presentAlert(with: model)
+    }
+    
+    internal func didLoadDataFromServer() {
+        hideLoadingIndicator()
+        setAnswerButtonsEnabled(true)
+        questionFactory?.requestNextQuestion()
+    }
+    
+    internal func didFailToLoadData (with error: Error) {
+        let userFriendlyMessage: String
+        
+        if let networkError = error as? NetworkClient.NetworkError {
+            switch networkError {
+            case .codeError:
+                userFriendlyMessage = "Сервер временно недоступен. Попробуйте позже."
+            }
+        } else {
+            let nsError = error as NSError
+            if nsError.domain == NSURLErrorDomain {
+                switch nsError.code {
+                case NSURLErrorNotConnectedToInternet:
+                    userFriendlyMessage = "Нет подключения к интернету. Проверьте соединение."
+                case NSURLErrorTimedOut:
+                    userFriendlyMessage = "Превышено время ожидания. Попробуйте еще раз."
+                default:
+                    userFriendlyMessage = "Ошибка загрузки данных: \(error.localizedDescription)"
+                }
+            } else {
+                userFriendlyMessage = "Произошла ошибка: \(error.localizedDescription)"
+            }
+        }
+        
+        showNetworkError(message: userFriendlyMessage)
     }
     
     // MARK: - Actions
