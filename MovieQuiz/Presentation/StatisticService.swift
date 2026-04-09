@@ -14,23 +14,23 @@ final class StatisticService {
     private let storage: UserDefaults = .standard
     
     private var totalCorrectAnswers: Int {
-           get {
-               storage.integer(forKey: Keys.totalCorrectAnswers.rawValue)
-           }
-           set {
-               storage.set(newValue, forKey: Keys.totalCorrectAnswers.rawValue)
-           }
-       }
-
+        get {
+            storage.integer(forKey: Keys.totalCorrectAnswers.rawValue)
+        }
+        set {
+            storage.set(newValue, forKey: Keys.totalCorrectAnswers.rawValue)
+        }
+    }
+    
     private var totalQuestionsAsked: Int {
-           get {
-               storage.integer(forKey: Keys.totalQuestionsAsked.rawValue)
-           }
-           set {
-               storage.set(newValue, forKey: Keys.totalQuestionsAsked.rawValue)
-           }
-       }
-   }
+        get {
+            storage.integer(forKey: Keys.totalQuestionsAsked.rawValue)
+        }
+        set {
+            storage.set(newValue, forKey: Keys.totalQuestionsAsked.rawValue)
+        }
+    }
+}
 
 extension StatisticService: StatisticServiceProtocol {
     var gamesCount: Int {
@@ -74,12 +74,12 @@ extension StatisticService: StatisticServiceProtocol {
     }
     
     func getFullStatistics() -> String {
-            let bestGame = bestGame
-
-            return """
+        let bestGame = bestGame
+        
+        return """
             Количество сыгранных квизов: \(gamesCount)
             Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.formattedDate))
             Средняя точность: \(String(format: "%.1f", totalAccuracy))%
             """
-        }
+    }
 }
