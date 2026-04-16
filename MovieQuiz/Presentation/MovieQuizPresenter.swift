@@ -62,18 +62,9 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     func makeResultsMessage() -> String {
-        let bestGame = statisticService.bestGame
-        let totalPlaysCountLine = "Количество сыгранных квизов: \(statisticService.gamesCount)"
-        let currentGameResultLine = "Ваш результат: \(correctAnswers)\\\(questionsAmount)"
-        let bestGameInfoLine = "Рекорд: \(bestGame.correct)\\\(bestGame.total)"
-        + " (\(bestGame.date.dateTimeString))"
-        let averageAccuracyLine = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
-        
-        let resultMessage = [
-            currentGameResultLine, totalPlaysCountLine, bestGameInfoLine, averageAccuracyLine
-        ].joined(separator: "\n")
-        
-        return resultMessage
+        statisticService.store(correct: correctAnswers, total: questionsAmount)
+        let fullStatistics = statisticService.getFullStatistics()
+        return fullStatistics
     }
     
     // MARK: - Private Methods
@@ -100,7 +91,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     private func showNextQuestionOrResults() {
         if isLastQuestion() {
-            statisticService.store(correct: correctAnswers, total: questionsAmount)
             let text = correctAnswers == questionsAmount ?
             "Поздравляем, вы ответили на 10 из 10!" :
             "Ваш результат \(correctAnswers)/\(questionsAmount), попробуйте ещё раз!"
@@ -123,7 +113,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         currentQuestionIndex += 1
     }
     
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
+    func convert(model: QuizQuestion) -> QuizStepViewModel {
         QuizStepViewModel(
             image: model.imageName,
             question: model.text,

@@ -18,6 +18,11 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Добавляем идентификаторы для UI-тестов
+        #if DEBUG
+        setupAccessibilityIdentifiers()
+        #endif
+        
         presenter = MovieQuizPresenter(viewController: self)
         
         alertPresenter = AlertPresenter(viewController: self)
@@ -30,11 +35,14 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     // MARK: - Functions
     
     func showResults(quiz result: QuizResultsViewModel) {
+        imageView.layer.borderWidth = 0
+        imageView.layer.borderColor = nil
+        
         let message = presenter.makeResultsMessage()
         
         let alertModel = AlertModel(
             title: result.title,
-            message: message,
+            message: result.text + "\n" + message,
             buttonText: result.buttonText,
             completion: { [weak self] in
                 guard let self = self else { return }
@@ -117,4 +125,22 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     
 }
 
-
+#if DEBUG
+private extension MovieQuizViewController {
+    func setupAccessibilityIdentifiers() {
+        // Кнопки
+        yesButton.accessibilityIdentifier = "YesButton"
+        noButton.accessibilityIdentifier = "NoButton"
+        
+        // Лейблы
+        counterLabel.accessibilityIdentifier = "IndexLabel"
+        textLabel.accessibilityIdentifier = "QuestionLabel"
+        
+        // Изображение
+        imageView.accessibilityIdentifier = "PosterImage"
+        
+        // Activity Indicator
+        activityIndicator.accessibilityIdentifier = "LoadingIndicator"
+    }
+}
+#endif

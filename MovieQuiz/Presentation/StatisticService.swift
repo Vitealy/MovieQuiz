@@ -3,7 +3,7 @@ import Foundation
 final class StatisticService {
     
     private enum Keys: String {
-        case gamesCount          
+        case gamesCount
         case bestGameCorrect
         case bestGameTotal
         case bestGameDate
@@ -77,9 +77,10 @@ extension StatisticService: StatisticServiceProtocol {
         let bestGame = bestGame
         
         return """
-            Количество сыгранных квизов: \(gamesCount)
-            Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.formattedDate))
-            Средняя точность: \(String(format: "%.1f", totalAccuracy))%
-            """
+         Количество сыгранных квизов: \(gamesCount)
+         Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.formattedDate))
+         Средняя точность: \(String(format: "%.1f", totalAccuracy))%
+         """
     }
+    
 }
