@@ -16,6 +16,11 @@ final class AlertPresenter {
             preferredStyle: .alert
         )
         
+        // Добавляем идентификатор для UI-тестов
+            #if DEBUG
+            alert.view.accessibilityIdentifier = "GameResultsAlert"
+            #endif
+        
         let action = UIAlertAction(
             title: model.buttonText,
             style: .default
