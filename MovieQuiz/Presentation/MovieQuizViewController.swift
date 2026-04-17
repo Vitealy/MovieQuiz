@@ -56,7 +56,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         imageView.layer.borderWidth = 0
         imageView.layer.borderColor = nil
         counterLabel.text = step.questionNumber
-        imageView.image = UIImage(data: step.image) ?? UIImage()
+        imageView.image = UIImage(data: step.imageData) ?? UIImage()
         textLabel.text = step.question
         setAnswerButtonsEnabled(true)
     }
